@@ -55,21 +55,39 @@ void myPanel::render(wxDC& dc)
 }
 
 void myPanel::drawTest(wxDC& dc) {
-	if (loaded) {
-		dc.DrawText(wavFile->GetName(), wxPoint(40, 60));
+	dc.DrawText(wavFile->GetName(), wxPoint(40, 60));
 
-		unsigned char buffer[4];
-		unsigned long* bit32 = new unsigned long;
-		wavFile->Read(buffer, sizeof(buffer));
-		wavFile->Read(bit32, sizeof(bit32));
-
-		unsigned long filesize = _byteswap_ulong(unsigned long(buffer));
+	if (!readHeader()) {
+		wxMessageBox("Error: Unable to parse header");
 	}
+	else {
+		dc.DrawText("Success.", wxPoint(100, 100));
+	}
+	
 }
 
 wxFFile* myPanel::getFile()
 {
 	return wavFile;
+}
+
+bool myPanel::readHeader()
+{
+	char buffer[4];
+	filesize = new unsigned long;
+	wavFile->Read(buffer, sizeof(buffer));
+	if (!strcmp(buffer, "RIFF")) {
+		return false;
+	}
+
+	wavFile->Read(filesize, sizeof(filesize));
+
+	wavFile->Read(buffer, sizeof(buffer));
+	if (!strcmp(buffer, "WAVE")) {
+		return false;
+	}
+
+	return true;
 }
 
 bool myPanel::isLoaded()

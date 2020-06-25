@@ -16,9 +16,11 @@ public:
 	void drawTest(wxDC& dc);
 	wxFFile* getFile();
 
-
 private:
+	bool readHeader();
+
 	wxFFile* wavFile;
+	unsigned long* filesize;
 	wxSize maxSize;
 	int midHeight;
 	int	maxHeight;
