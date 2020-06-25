@@ -18,9 +18,10 @@ public:
 
 private:
 	bool readHeader();
+	void readChunk1();
 
 	wxFFile* wavFile;
-	unsigned long* filesize;
+	uint32_t* filesize;
 	wxSize maxSize;
 	int midHeight;
 	int	maxHeight;

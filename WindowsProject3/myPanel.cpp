@@ -24,6 +24,7 @@ myPanel::myPanel(wxFrame* parent, wxFFile* audioFile) : wxPanel(parent), wavFile
 
 myPanel::~myPanel()
 {
+	delete filesize;
 }
 
 void myPanel::paintEvent(wxPaintEvent& event)
@@ -60,10 +61,9 @@ void myPanel::drawTest(wxDC& dc) {
 	if (!readHeader()) {
 		wxMessageBox("Error: Unable to parse header");
 	}
-	else {
-		dc.DrawText("Success.", wxPoint(100, 100));
-	}
 	
+	readChunk1();
+
 }
 
 wxFFile* myPanel::getFile()
@@ -74,7 +74,7 @@ wxFFile* myPanel::getFile()
 bool myPanel::readHeader()
 {
 	char buffer[4];
-	filesize = new unsigned long;
+	filesize = new uint32_t;
 	wavFile->Read(buffer, sizeof(buffer));
 	if (!strcmp(buffer, "RIFF")) {
 		return false;
@@ -88,6 +88,51 @@ bool myPanel::readHeader()
 	}
 
 	return true;
+}
+
+void myPanel::readChunk1() {
+	//verify fmt
+	char buffer[4];
+
+	wavFile->Read(buffer, sizeof(buffer));
+	if (!strcmp(buffer, "fmt ")) {
+		wxMessageBox("Error: fmt missing");
+		return;
+	}
+
+	uint32_t* buffer4B = new uint32_t;
+	short* buffer2B = new short;
+
+	//Subchunk 1 Size
+	wavFile->Read(buffer4B, sizeof(buffer4B));
+	uint32_t chunk1Size = *buffer4B;
+
+	//Audio Format (PCM == 1)
+	wavFile->Read(buffer2B, sizeof(buffer2B));
+	short audioFormat = *buffer2B;
+
+	//Channels
+	wavFile->Read(buffer2B, sizeof(buffer2B));
+	short channelNo = *buffer2B;
+
+	//Sample Rate
+	wavFile->Read(buffer4B, sizeof(buffer4B));
+	uint32_t sampleRate = *buffer4B;
+
+	//Byte Rate (Hz)
+	wavFile->Read(buffer4B, sizeof(buffer4B));
+	uint32_t byteRate = *buffer4B;
+
+	//Block Align (bytes per sample)
+	wavFile->Read(buffer4B, sizeof(buffer4B));
+	uint32_t blockAlign = *buffer4B;
+
+	//Bits per sample
+	wavFile->Read(buffer4B, sizeof(buffer4B));
+	uint32_t bitsPerSample = *buffer4B;
+
+
+	delete buffer4B, buffer2B;
 }
 
 bool myPanel::isLoaded()
