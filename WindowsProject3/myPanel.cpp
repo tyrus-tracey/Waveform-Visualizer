@@ -131,8 +131,7 @@ void myPanel::readChunk1() {
 	wavFile->Read(buffer2B, sizeof(buffer2B));
 	unsigned short bitsPerSample = *buffer2B;
 
-
-	delete buffer4B, buffer2B;
+	delete buffer4B;
 }
 
 bool myPanel::isLoaded()
