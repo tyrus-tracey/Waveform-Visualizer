@@ -101,7 +101,7 @@ void myPanel::readChunk1() {
 	}
 
 	uint32_t* buffer4B = new uint32_t;
-	short* buffer2B = new short;
+	unsigned char buffer2B[2];
 
 	//Subchunk 1 Size
 	wavFile->Read(buffer4B, sizeof(buffer4B));
@@ -109,11 +109,11 @@ void myPanel::readChunk1() {
 
 	//Audio Format (PCM == 1)
 	wavFile->Read(buffer2B, sizeof(buffer2B));
-	short audioFormat = *buffer2B;
+	unsigned short audioFormat = *buffer2B;
 
-	//Channels
+	//Channels 
 	wavFile->Read(buffer2B, sizeof(buffer2B));
-	short channelNo = *buffer2B;
+	unsigned short channelNo = *buffer2B;
 
 	//Sample Rate
 	wavFile->Read(buffer4B, sizeof(buffer4B));
@@ -124,12 +124,12 @@ void myPanel::readChunk1() {
 	uint32_t byteRate = *buffer4B;
 
 	//Block Align (bytes per sample)
-	wavFile->Read(buffer4B, sizeof(buffer4B));
-	uint32_t blockAlign = *buffer4B;
+	wavFile->Read(buffer2B, sizeof(buffer2B));
+	unsigned short blockAlign = *buffer2B;
 
 	//Bits per sample
-	wavFile->Read(buffer4B, sizeof(buffer4B));
-	uint32_t bitsPerSample = *buffer4B;
+	wavFile->Read(buffer2B, sizeof(buffer2B));
+	unsigned short bitsPerSample = *buffer2B;
 
 
 	delete buffer4B, buffer2B;
