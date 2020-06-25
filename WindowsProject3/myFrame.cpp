@@ -72,7 +72,7 @@ void myFrame::OnOpen(wxCommandEvent& event)
 
 	Refresh();
 	if (panel->isLoaded()) {
-		wxMessageBox(panel->filename, "File Loaded");
+		wxMessageBox(panel->getFile()->GetName(), "File Loaded");
 	}
 	
 }

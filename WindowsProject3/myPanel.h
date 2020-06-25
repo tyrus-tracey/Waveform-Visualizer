@@ -14,8 +14,8 @@ public:
 	bool isLoaded();
 	void nowLoaded();
 	void drawTest(wxDC& dc);
+	wxFFile* getFile();
 
-	wxString filename;
 
 private:
 	wxFFile* wavFile;

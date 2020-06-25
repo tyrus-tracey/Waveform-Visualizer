@@ -6,9 +6,13 @@ END_EVENT_TABLE()
 
 myPanel::myPanel(wxFrame* parent, wxFFile* audioFile) : wxPanel(parent), wavFile(audioFile)
 {
-	filename = wavFile->GetName();
-	loaded = true;
-
+	wavFile = audioFile;
+	if (wavFile != NULL) {
+		loaded = true;
+	}
+	else {
+		wxMessageBox("Error: Could not find associated WAVE file.");
+	}
 	maxSize = parent->GetSize();
 	SetSize(maxSize);
 	midHeight	= maxSize.y / 2;
@@ -52,7 +56,7 @@ void myPanel::render(wxDC& dc)
 
 void myPanel::drawTest(wxDC& dc) {
 	if (loaded) {
-		dc.DrawText(filename, wxPoint(40, 60));
+		dc.DrawText(wavFile->GetName(), wxPoint(40, 60));
 
 		unsigned char buffer[4];
 		unsigned long* bit32 = new unsigned long;
@@ -61,6 +65,11 @@ void myPanel::drawTest(wxDC& dc) {
 
 		unsigned long filesize = _byteswap_ulong(unsigned long(buffer));
 	}
+}
+
+wxFFile* myPanel::getFile()
+{
+	return wavFile;
 }
 
 bool myPanel::isLoaded()
