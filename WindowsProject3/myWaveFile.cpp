@@ -1,11 +1,13 @@
 #include "myWaveFile.h"
 #include "wx/wx.h"
+#include "intrin.h"
 
 myWaveFile::myWaveFile(wxString filepath)
 	: wxFFile(filepath, "r")
 {
 	filename = filepath;
 	filesize = 0; 
+
 	chunk1Size = 0;
 	audioFormat = 0;
 	channels = 0;
@@ -13,6 +15,8 @@ myWaveFile::myWaveFile(wxString filepath)
 	byteRate = 0;
 	blockAlign = 0; 
 	bitsPerSample = 0;
+
+	chunk2Size = 0;
 }
 
 myWaveFile::~myWaveFile() {
@@ -80,4 +84,18 @@ void myWaveFile::readSubChunk1() {
 	bitsPerSample = *buffer2B;
 
 	delete buffer4B;
+}
+
+void myWaveFile::readSubChunk2() {
+	char buffer4B[4];
+	uint32_t* intBuffer4B = new uint32_t;
+
+	Read(buffer4B, sizeof(buffer4B));
+	if (!strcmp(buffer4B, "data")) {
+		wxMessageBox("Error: Unable to locate data subchunk");
+		return;
+	}
+
+	Read(intBuffer4B, sizeof(intBuffer4B));
+	chunk2Size = *intBuffer4B;
 }

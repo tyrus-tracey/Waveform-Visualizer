@@ -23,6 +23,9 @@ private:
 	uint32_t byteRate;
 	unsigned short blockAlign;
 	unsigned short bitsPerSample;
+	
+	//SubChunk2
+	uint32_t chunk2Size;
 
 };
 

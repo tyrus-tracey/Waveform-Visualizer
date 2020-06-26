@@ -65,6 +65,7 @@ void myPanel::drawTest(wxDC& dc) {
 	}
 
 	wavFile->readSubChunk1();
+	wavFile->readSubChunk2();
 }
 
 myWaveFile* myPanel::getFile()
