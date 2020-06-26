@@ -48,12 +48,7 @@ void myPanel::render(wxDC& dc)
 	dc.SetPen(pen);
 	dc.SetBrush(brush);
 
-	//dc.DrawText(wxT("Testing"), 40, 60);
 	dc.DrawRectangle(wxRect(maxSize));
-
-	//draw a crosshair
-	dc.DrawLine(wxPoint(midWidth - 10, midHeight), wxPoint(midWidth + 10, midHeight));
-	dc.DrawLine(wxPoint(midWidth, midHeight - 10), wxPoint(midWidth, midHeight + 10));
 	
 }
 
@@ -71,8 +66,16 @@ void myPanel::drawTest(wxDC& dc) {
 
 	//Display waveform
 	for (int i = 0; i < wavFile->getSampleCount(); i++) {
-		dc.DrawLine(wxPoint(i, midHeight), wxPoint(i, wavFile->getDataAmplitude(i)));
+		int amplitude = wavFile->getDataAmplitude(i) / 2;
+		dc.DrawLine(wxPoint(i, midHeight-amplitude), wxPoint(i, midHeight+amplitude));
 	}
+
+	//Draw cutoff after last sample
+	wxPen pen = dc.GetPen();
+	pen.SetStyle(wxPENSTYLE_DOT);
+	pen.SetColour(wxT("RED"));
+	dc.SetPen(pen);
+
 }
 
 myWaveFile* myPanel::getFile()
