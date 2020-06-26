@@ -87,6 +87,8 @@ void myWaveFile::readSubChunk1() {
 }
 
 void myWaveFile::readSubChunk2() {
+	char buffer1B[1];
+	char buffer2B[2];
 	char buffer4B[4];
 	uint32_t* intBuffer4B = new uint32_t;
 
@@ -98,4 +100,45 @@ void myWaveFile::readSubChunk2() {
 
 	Read(intBuffer4B, sizeof(intBuffer4B));
 	chunk2Size = *intBuffer4B;
+
+	numberOfSamples = chunk2Size / bitsPerSample * 8;
+
+
+	//Begin reading audio data
+	if (bitsPerSample == 8) {
+		dataArray8b = new unsigned int[numberOfSamples];
+		int i = 0;
+		while (!Eof()) {
+			Read(buffer1B, sizeof(buffer1B));
+			dataArray8b[i++] = *buffer1B;
+		}
+	}
+	else if (bitsPerSample == 16) {
+		dataArray16b = new short[numberOfSamples];
+		int i = 0;
+		while (!Eof()) {
+			Read(buffer2B, sizeof(buffer2B));
+			dataArray16b[i++] = *buffer2B;
+		}
+	}
+
 }
+
+int myWaveFile::getSampleCount()
+{
+	return numberOfSamples;
+}
+
+short myWaveFile::getDataAmplitude(int index)
+{
+	if (0 <= index && index <= numberOfSamples) {
+		if (bitsPerSample == 8) {
+			return dataArray8b[index];
+		}
+		else if (bitsPerSample == 16) {
+			return dataArray16b[index];
+		}
+	}
+	return -1;
+}
+

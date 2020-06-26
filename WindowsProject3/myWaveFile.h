@@ -9,6 +9,8 @@ public:
 	bool readHeader();
 	void readSubChunk1();
 	void readSubChunk2();
+	int getSampleCount();
+	short getDataAmplitude(int index);
 
 private:
 	//Header
@@ -23,9 +25,11 @@ private:
 	uint32_t byteRate;
 	unsigned short blockAlign;
 	unsigned short bitsPerSample;
+	unsigned short numberOfSamples;
 	
 	//SubChunk2
 	uint32_t chunk2Size;
-
+	unsigned int* dataArray8b = NULL;
+	short* dataArray16b = NULL;
 };
 
