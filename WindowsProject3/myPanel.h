@@ -2,11 +2,12 @@
 #include "wx/wx.h"
 #include "wx/dcbuffer.h"
 #include "wx/wfstream.h"
+#include "myWaveFile.h"
 
 class myPanel : public wxPanel
 {
 public:
-	myPanel(wxFrame* parent, wxFFile* wavFile);
+	myPanel(wxFrame* parent, myWaveFile* audioFile);
 	~myPanel();
 
 	void paintEvent(wxPaintEvent& event);
@@ -14,14 +15,12 @@ public:
 	bool isLoaded();
 	void nowLoaded();
 	void drawTest(wxDC& dc);
-	wxFFile* getFile();
+	myWaveFile* getFile();
 
 private:
-	bool readHeader();
-	void readChunk1();
 
-	wxFFile* wavFile;
-	uint32_t* filesize;
+	myWaveFile* wavFile;
+
 	wxSize maxSize;
 	int midHeight;
 	int	maxHeight;

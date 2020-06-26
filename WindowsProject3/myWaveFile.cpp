@@ -2,8 +2,17 @@
 #include "wx/wx.h"
 
 myWaveFile::myWaveFile(wxString filepath)
-	: filename(filepath)
+	: wxFFile(filepath, "r")
 {
+	filename = filepath;
+	filesize = 0; 
+	chunk1Size = 0;
+	audioFormat = 0;
+	channels = 0;
+	sampleRate = 0;
+	byteRate = 0;
+	blockAlign = 0; 
+	bitsPerSample = 0;
 }
 
 myWaveFile::~myWaveFile() {

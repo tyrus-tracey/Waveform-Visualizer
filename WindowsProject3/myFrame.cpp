@@ -1,4 +1,5 @@
 #include "myFrame.h"
+#include "myWaveFile.h"
 #include <intrin.h>
 
 myFrame::myFrame(wxSize& appDimensions) 
@@ -61,7 +62,7 @@ void myFrame::OnOpen(wxCommandEvent& event)
 		return;
 	}
 	
-	wxFFile* inputFile = new wxFFile(openDialog.GetPath());
+	myWaveFile* inputFile = new myWaveFile(openDialog.GetPath());
 	
 	if (!inputFile->IsOpened()) {
 		wxMessageBox("File could not open. Please try again.");

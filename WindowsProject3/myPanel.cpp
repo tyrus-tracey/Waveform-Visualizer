@@ -4,7 +4,8 @@ wxBEGIN_EVENT_TABLE(myPanel, wxPanel)
 EVT_PAINT(myPanel::paintEvent)
 END_EVENT_TABLE()
 
-myPanel::myPanel(wxFrame* parent, wxFFile* audioFile) : wxPanel(parent), wavFile(audioFile)
+myPanel::myPanel(wxFrame* parent, myWaveFile* audioFile) 
+	: wxPanel(parent, wxID_ANY, wxPoint(0,0), wxSize(500,500))
 {
 	wavFile = audioFile;
 	if (wavFile != NULL) {
@@ -13,6 +14,8 @@ myPanel::myPanel(wxFrame* parent, wxFFile* audioFile) : wxPanel(parent), wavFile
 	else {
 		wxMessageBox("Error: Could not find associated WAVE file.");
 	}
+
+
 	maxSize = parent->GetSize();
 	SetSize(maxSize);
 	midHeight	= maxSize.y / 2;
@@ -24,7 +27,6 @@ myPanel::myPanel(wxFrame* parent, wxFFile* audioFile) : wxPanel(parent), wavFile
 
 myPanel::~myPanel()
 {
-	delete filesize;
 }
 
 void myPanel::paintEvent(wxPaintEvent& event)
@@ -58,80 +60,16 @@ void myPanel::render(wxDC& dc)
 void myPanel::drawTest(wxDC& dc) {
 	dc.DrawText(wavFile->GetName(), wxPoint(40, 60));
 
-	if (!readHeader()) {
+	if (!wavFile->readHeader()) {
 		wxMessageBox("Error: Unable to parse header");
 	}
-	
-	readChunk1();
 
+	wavFile->readSubChunk1();
 }
 
-wxFFile* myPanel::getFile()
+myWaveFile* myPanel::getFile()
 {
 	return wavFile;
-}
-
-bool myPanel::readHeader()
-{
-	char buffer[4];
-	filesize = new uint32_t;
-	wavFile->Read(buffer, sizeof(buffer));
-	if (!strcmp(buffer, "RIFF")) {
-		return false;
-	}
-
-	wavFile->Read(filesize, sizeof(filesize));
-
-	wavFile->Read(buffer, sizeof(buffer));
-	if (!strcmp(buffer, "WAVE")) {
-		return false;
-	}
-
-	return true;
-}
-
-void myPanel::readChunk1() {
-	//verify fmt
-	char buffer[4];
-
-	wavFile->Read(buffer, sizeof(buffer));
-	if (!strcmp(buffer, "fmt ")) {
-		wxMessageBox("Error: fmt missing");
-		return;
-	}
-
-	uint32_t* buffer4B = new uint32_t;
-	unsigned char buffer2B[2];
-
-	//Subchunk 1 Size
-	wavFile->Read(buffer4B, sizeof(buffer4B));
-	uint32_t chunk1Size = *buffer4B;
-
-	//Audio Format (PCM == 1)
-	wavFile->Read(buffer2B, sizeof(buffer2B));
-	unsigned short audioFormat = *buffer2B;
-
-	//Channels 
-	wavFile->Read(buffer2B, sizeof(buffer2B));
-	unsigned short channelNo = *buffer2B;
-
-	//Sample Rate
-	wavFile->Read(buffer4B, sizeof(buffer4B));
-	uint32_t sampleRate = *buffer4B;
-
-	//Byte Rate (Hz)
-	wavFile->Read(buffer4B, sizeof(buffer4B));
-	uint32_t byteRate = *buffer4B;
-
-	//Block Align (bytes per sample)
-	wavFile->Read(buffer2B, sizeof(buffer2B));
-	unsigned short blockAlign = *buffer2B;
-
-	//Bits per sample
-	wavFile->Read(buffer2B, sizeof(buffer2B));
-	unsigned short bitsPerSample = *buffer2B;
-
-	delete buffer4B;
 }
 
 bool myPanel::isLoaded()
