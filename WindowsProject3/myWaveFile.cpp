@@ -20,7 +20,8 @@ myWaveFile::myWaveFile(wxString filepath)
 }
 
 myWaveFile::~myWaveFile() {
-
+	if (dataArray8b) { delete dataArray8b; }
+	else if (dataArray16b) { delete dataArray16b; }
 }
 
 bool myWaveFile::readHeader() {
@@ -31,8 +32,7 @@ bool myWaveFile::readHeader() {
 		return false;
 	}
 
-	Read(buffer4B, sizeof(buffer4B));
-	filesize = *buffer4B;
+	Read(&filesize, sizeof(filesize));
 
 	Read(buffer4B, sizeof(buffer4B));
 	if (!strcmp(buffer4B, "WAVE")) {
@@ -98,29 +98,33 @@ void myWaveFile::readSubChunk2() {
 		return;
 	}
 
-	Read(intBuffer4B, sizeof(intBuffer4B));
-	chunk2Size = *intBuffer4B;
+	Read(&chunk2Size, sizeof(chunk2Size));
 
-	numberOfSamples = chunk2Size / bitsPerSample * 8;
+	numberOfSamples = (chunk2Size / channels) / (bitsPerSample / 8);
 
+	//BUG: numberOfSamples != i when EOF is reached.
+	// find a WAV analysis software and compare parameters??
+	//Possible fix: read to direct address of relevant variable (instead of buffer vars)
+	int i = 0;
 
 	//Begin reading audio data
 	if (bitsPerSample == 8) {
 		dataArray8b = new unsigned int[numberOfSamples];
-		int i = 0;
 		while (!Eof()) {
 			Read(buffer1B, sizeof(buffer1B));
 			dataArray8b[i++] = *buffer1B;
 		}
 	}
 	else if (bitsPerSample == 16) {
+		
 		dataArray16b = new short[numberOfSamples];
-		int i = 0;
-		while (!Eof()) {
-			Read(buffer2B, sizeof(buffer2B));
+		while (Read(buffer2B, sizeof(buffer2B) == 2)){
 			dataArray16b[i++] = *buffer2B;
 		}
+		
 	}
+
+	delete intBuffer4B;
 
 }
 

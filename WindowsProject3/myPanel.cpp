@@ -5,7 +5,7 @@ EVT_PAINT(myPanel::paintEvent)
 END_EVENT_TABLE()
 
 myPanel::myPanel(wxFrame* parent, myWaveFile* audioFile) 
-	: wxPanel(parent, wxID_ANY, wxPoint(0,0), wxSize(500,500))
+	: wxPanel(parent, wxID_ANY, wxPoint(0,0), parent->GetSize())
 {
 	wavFile = audioFile;
 	if (wavFile != NULL) {
