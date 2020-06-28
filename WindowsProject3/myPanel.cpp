@@ -56,13 +56,15 @@ void myPanel::drawTest(wxDC& dc) {
 	dc.DrawText(wavFile->GetName(), wxPoint(40, 60));
 
 	// Read wave file
-	if (!wavFile->readHeader()) {
-		wxMessageBox("Error: Unable to parse header");
+	if (wavFile->IsOpened()) {
+		if (!wavFile->readHeader()) {
+			wxMessageBox("Error: Unable to parse header");
+		}
+		else {
+			wavFile->readSubChunk1();
+			wavFile->readSubChunk2();
+		}
 	}
-
-	wavFile->readSubChunk1();
-	wavFile->readSubChunk2();
-
 
 	//Display waveform
 	for (int i = 0; i < wavFile->getSampleCount(); i++) {

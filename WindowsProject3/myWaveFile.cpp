@@ -25,17 +25,19 @@ myWaveFile::~myWaveFile() {
 }
 
 bool myWaveFile::readHeader() {
-	char buffer4B[4];
+	char buffer4B[5];
 
-	Read(buffer4B, sizeof(buffer4B));
-	if (!strcmp(buffer4B, "RIFF")) {
+	Read(buffer4B, 4);
+	buffer4B[4] = '\0';
+	if (strcmp(buffer4B, "RIFF")) {
 		return false;
 	}
 
 	Read(&filesize, sizeof(filesize));
 
-	Read(buffer4B, sizeof(buffer4B));
-	if (!strcmp(buffer4B, "WAVE")) {
+	Read(buffer4B, 4);
+	buffer4B[4] = '\0';
+	if (strcmp(buffer4B, "WAVE")) {
 		return false;
 	}
 
@@ -44,10 +46,11 @@ bool myWaveFile::readHeader() {
 
 void myWaveFile::readSubChunk1() {
 	//verify fmt
-	char buffer[4];
+	char buffer[5];
 
-	Read(buffer, sizeof(buffer));
-	if (!strcmp(buffer, "fmt ")) {
+	Read(buffer, 4);
+	buffer[4] = '\0';
+	if (strcmp(buffer, "fmt ")) {
 		wxMessageBox("Error: fmt missing");
 		return;
 	}
@@ -90,10 +93,12 @@ void myWaveFile::readSubChunk2() {
 	char buffer1B[1];
 	char buffer2B[2];
 	char buffer4B[4];
+	char charBuffer[5];
 	uint32_t* intBuffer4B = new uint32_t;
 
-	Read(buffer4B, sizeof(buffer4B));
-	if (!strcmp(buffer4B, "data")) {
+	Read(charBuffer, 4);
+	charBuffer[4] = '\0';
+	if (strcmp(charBuffer, "data")) {
 		wxMessageBox("Error: Unable to locate data subchunk");
 		return;
 	}
@@ -102,11 +107,7 @@ void myWaveFile::readSubChunk2() {
 
 	numberOfSamples = (chunk2Size / channels) / (bitsPerSample / 8);
 
-	//BUG: numberOfSamples != i when EOF is reached.
-	// find a WAV analysis software and compare parameters??
-	//Possible fix: read to direct address of relevant variable (instead of buffer vars)
 	int i = 0;
-
 	//Begin reading audio data
 	if (bitsPerSample == 8) {
 		dataArray8b = new unsigned int[numberOfSamples];
@@ -116,14 +117,21 @@ void myWaveFile::readSubChunk2() {
 		}
 	}
 	else if (bitsPerSample == 16) {
-		
 		dataArray16b = new short[numberOfSamples];
-		while (Read(buffer2B, sizeof(buffer2B) == 2)){
+		/*
+		while (Read(buffer2B, sizeof(buffer2B)) == 2){
+			short test = *buffer2B;
 			dataArray16b[i++] = *buffer2B;
+		}
+		*/
+		for (int i = 0; i < numberOfSamples; i++) {
+			Read(buffer4B, sizeof(buffer4B));
+			dataArray16b[i] = *buffer4B;
 		}
 		
 	}
 
+	Close();
 	delete intBuffer4B;
 
 }
