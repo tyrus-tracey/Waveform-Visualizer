@@ -3,7 +3,7 @@
 #include "intrin.h"
 
 myWaveFile::myWaveFile(wxString filepath)
-	: wxFFile(filepath, "r")
+	: wxFFile(filepath, "rb")
 {
 	filename = filepath;
 	filesize = 0; 
