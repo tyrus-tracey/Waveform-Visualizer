@@ -4,14 +4,11 @@ wxBEGIN_EVENT_TABLE(myPanel, wxPanel)
 EVT_PAINT(myPanel::paintEvent)
 END_EVENT_TABLE()
 
-myPanel::myPanel(wxFrame* parent, myWaveFile* audioFile) 
+myPanel::myPanel(wxFrame* parent, const wxString filepath) 
 	: wxPanel(parent, wxID_ANY, wxPoint(0,0), parent->GetSize())
 {
-	wavFile = audioFile;
-	if (wavFile != NULL) {
-		loaded = true;
-	}
-	else {
+	wavFile = new myWaveFile(filepath);
+	if(wavFile == NULL) {
 		wxMessageBox("Error: Could not find associated WAVE file.");
 	}
 
@@ -27,6 +24,7 @@ myPanel::myPanel(wxFrame* parent, myWaveFile* audioFile)
 
 myPanel::~myPanel()
 {
+	delete wavFile; // Does sampleData get deleted when this triggers?
 }
 
 void myPanel::paintEvent(wxPaintEvent& event)
@@ -34,9 +32,8 @@ void myPanel::paintEvent(wxPaintEvent& event)
 	wxBufferedPaintDC dc(this);
 	PrepareDC(dc);
 	render(dc);
-	if (loaded) {
-		drawTest(dc);
-	}
+	
+	drawTest(dc);
 }
 
 void myPanel::render(wxDC& dc)
@@ -65,33 +62,17 @@ void myPanel::drawTest(wxDC& dc) {
 			wavFile->readSubChunk2();
 		}
 	}
-
-	//Display waveform
-	for (int i = 0; i < wavFile->getSampleCount(); i++) {
-		int amplitude = wavFile->getDataAmplitude(i) / 2;
-		dc.DrawLine(wxPoint(i, midHeight-amplitude), wxPoint(i, midHeight+amplitude));
+	
+	if (!wavFile->IsOpened()) {
+		for (int i = 0; i < GetSize().x; i++) {
+			int amplitude = wavFile->getDataAmplitude(i) / 2;
+			dc.DrawLine(wxPoint(i, midHeight - amplitude), wxPoint(i, midHeight + amplitude));
+		}
 	}
-
-	//Draw cutoff after last sample
-	wxPen pen = dc.GetPen();
-	pen.SetStyle(wxPENSTYLE_DOT);
-	pen.SetColour(wxT("RED"));
-	dc.SetPen(pen);
 
 }
 
 myWaveFile* myPanel::getFile()
 {
 	return wavFile;
-}
-
-bool myPanel::isLoaded()
-{
-	return loaded;
-}
-
-void myPanel::nowLoaded()
-{
-	loaded = true;
-	return;
 }

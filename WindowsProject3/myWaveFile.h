@@ -10,11 +10,10 @@ public:
 	void readSubChunk1();
 	void readSubChunk2();
 	int getSampleCount();
-	short getDataAmplitude(int index);
+	long getDataAmplitude(int index);
 
 private:
 	//Header
-	wxString filename;
 	uint32_t filesize;
 
 	//SubChunk1
@@ -31,5 +30,6 @@ private:
 	uint32_t chunk2Size;
 	unsigned int* dataArray8b = NULL;
 	short* dataArray16b = NULL;
+	long* sampleData = NULL;
 };
 

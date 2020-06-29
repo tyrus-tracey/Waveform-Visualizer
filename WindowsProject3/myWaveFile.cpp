@@ -5,7 +5,6 @@
 myWaveFile::myWaveFile(wxString filepath)
 	: wxFFile(filepath, "rb")
 {
-	filename = filepath;
 	filesize = 0; 
 
 	chunk1Size = 0;
@@ -20,8 +19,7 @@ myWaveFile::myWaveFile(wxString filepath)
 }
 
 myWaveFile::~myWaveFile() {
-	if (dataArray8b) { delete dataArray8b; }
-	else if (dataArray16b) { delete dataArray16b; }
+	delete sampleData;
 }
 
 bool myWaveFile::readHeader() {
@@ -46,55 +44,28 @@ bool myWaveFile::readHeader() {
 
 void myWaveFile::readSubChunk1() {
 	//verify fmt
-	char buffer[5];
+	char charBuffer[5];
 
-	Read(buffer, 4);
-	buffer[4] = '\0';
-	if (strcmp(buffer, "fmt ")) {
+	Read(charBuffer, 4);
+	charBuffer[4] = '\0';
+	if (strcmp(charBuffer, "fmt ")) {
 		wxMessageBox("Error: fmt missing");
 		return;
 	}
 
-	uint32_t* buffer4B = new uint32_t;
-	unsigned char buffer2B[2];
-
-	//Subchunk 1 Size
-	Read(buffer4B, sizeof(buffer4B));
-	chunk1Size = *buffer4B;
-
-	//Audio Format (PCM == 1)
-	Read(buffer2B, sizeof(buffer2B));
-	audioFormat = *buffer2B;
-
-	//Channels 
-	Read(buffer2B, sizeof(buffer2B));
-	channels = *buffer2B;
-
-	//Sample Rate
-	Read(buffer4B, sizeof(buffer4B));
-	sampleRate = *buffer4B;
-
-	//Byte Rate (Hz)
-	Read(buffer4B, sizeof(buffer4B));
-	byteRate = *buffer4B;
-
-	//Block Align (bytes per sample)
-	Read(buffer2B, sizeof(buffer2B));
-	blockAlign = *buffer2B;
-
-	//Bits per sample
-	Read(buffer2B, sizeof(buffer2B));
-	bitsPerSample = *buffer2B;
-
-	delete buffer4B;
+	Read(&chunk1Size, 4);
+	Read(&audioFormat, 2);
+	Read(&channels, 2);
+	Read(&sampleRate, 4);
+	Read(&byteRate, 4);
+	Read(&blockAlign, 2);
+	Read(&bitsPerSample, 2);
 }
 
 void myWaveFile::readSubChunk2() {
 	char buffer1B[1];
-	char buffer2B[2];
 	char buffer4B[4];
 	char charBuffer[5];
-	uint32_t* intBuffer4B = new uint32_t;
 
 	Read(charBuffer, 4);
 	charBuffer[4] = '\0';
@@ -118,22 +89,34 @@ void myWaveFile::readSubChunk2() {
 	}
 	else if (bitsPerSample == 16) {
 		dataArray16b = new short[numberOfSamples];
-		/*
-		while (Read(buffer2B, sizeof(buffer2B)) == 2){
-			short test = *buffer2B;
-			dataArray16b[i++] = *buffer2B;
-		}
-		*/
-		for (int i = 0; i < numberOfSamples; i++) {
+
+		for (i = 0; i < numberOfSamples; i++) {
 			Read(buffer4B, sizeof(buffer4B));
 			dataArray16b[i] = *buffer4B;
 		}
 		
 	}
 
+	// Average out data points to fit on screen (1000px?)
+	int residue = numberOfSamples % 1000;
+	int scaleFactor = numberOfSamples / 1000;
+	long sum = 0;
+	int j = 0;
+	sampleData = new long[1000];
+	int count = 0;
+	//BUG: count goes greater than 1000
+	for (i = 0; i < numberOfSamples-residue-scaleFactor; i+=scaleFactor) {
+		for (j = 0; j < scaleFactor; j++) {
+			sum += dataArray16b[i + j];
+		}
+		sum /= j;
+		sampleData[count] = sum;
+		count++;
+	}
+	
+	delete[] dataArray8b;
+	delete[] dataArray16b;
 	Close();
-	delete intBuffer4B;
-
 }
 
 int myWaveFile::getSampleCount()
@@ -141,15 +124,10 @@ int myWaveFile::getSampleCount()
 	return numberOfSamples;
 }
 
-short myWaveFile::getDataAmplitude(int index)
+long myWaveFile::getDataAmplitude(int index)
 {
 	if (0 <= index && index <= numberOfSamples) {
-		if (bitsPerSample == 8) {
-			return dataArray8b[index];
-		}
-		else if (bitsPerSample == 16) {
-			return dataArray16b[index];
-		}
+		return sampleData[index];
 	}
 	return -1;
 }

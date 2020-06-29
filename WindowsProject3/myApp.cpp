@@ -7,7 +7,6 @@ myApp::myApp() {
 }
 
 myApp::~myApp() {
-
 }
 
 wxSize myApp::getDimensions() {

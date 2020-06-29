@@ -50,11 +50,17 @@ void myFrame::OnAbout(wxCommandEvent& event) {
 }
 
 void myFrame::OnExit(wxCommandEvent& event) {
+	if (panel != NULL) {
+		panel->Close(true);
+	}
 	Close(true);
 }
 
 void myFrame::OnOpen(wxCommandEvent& event)
 {
+	if (panel != NULL) {
+		panel->Close(true);
+	}
 	wxFileDialog openDialog(this, ("Open a Wave file"), "", "", "Wave files (*.wav)|*.wav", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	
 	if (openDialog.ShowModal() == wxID_CANCEL) {
@@ -62,18 +68,10 @@ void myFrame::OnOpen(wxCommandEvent& event)
 		return;
 	}
 	
-	myWaveFile* inputFile = new myWaveFile(openDialog.GetPath());
+	//myWaveFile* inputFile = new myWaveFile(openDialog.GetPath());
 	
-	if (!inputFile->IsOpened()) {
-		wxMessageBox("File could not open. Please try again.");
-	}
-	
-	panel = new myPanel(this, inputFile);
+	panel = new myPanel(this, openDialog.GetPath());
 	GetSizer()->Add(panel, 1, wxEXPAND);
 
 	Refresh();
-	if (panel->isLoaded()) {
-		wxMessageBox(panel->getFile()->GetName(), "File Loaded");
-	}
-	
 }

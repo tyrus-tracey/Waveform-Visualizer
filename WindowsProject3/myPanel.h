@@ -7,13 +7,11 @@
 class myPanel : public wxPanel
 {
 public:
-	myPanel(wxFrame* parent, myWaveFile* audioFile);
+	myPanel(wxFrame* parent, const wxString filepath);
 	~myPanel();
 
 	void paintEvent(wxPaintEvent& event);
 	void render(wxDC& dc);
-	bool isLoaded();
-	void nowLoaded();
 	void drawTest(wxDC& dc);
 	myWaveFile* getFile();
 

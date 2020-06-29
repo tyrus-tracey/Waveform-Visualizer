@@ -12,7 +12,7 @@ public:
 
 private:
 	myFrame* frame = NULL;
-	wxSize dimensions = wxSize(800, 600);
+	wxSize dimensions = wxSize(1000, 600);
 	
 };
 
