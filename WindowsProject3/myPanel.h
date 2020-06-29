@@ -3,6 +3,7 @@
 #include "wx/dcbuffer.h"
 #include "wx/wfstream.h"
 #include "myWaveFile.h"
+#include "wx/panel.h"
 
 class myPanel : public wxPanel
 {

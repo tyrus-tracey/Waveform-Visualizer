@@ -24,7 +24,7 @@ myPanel::myPanel(wxFrame* parent, const wxString filepath)
 
 myPanel::~myPanel()
 {
-	delete wavFile; // Does sampleData get deleted when this triggers?
+	delete wavFile;
 }
 
 void myPanel::paintEvent(wxPaintEvent& event)

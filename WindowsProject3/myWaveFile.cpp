@@ -14,12 +14,12 @@ myWaveFile::myWaveFile(wxString filepath)
 	byteRate = 0;
 	blockAlign = 0; 
 	bitsPerSample = 0;
-
+	numberOfSamples = 0;
 	chunk2Size = 0;
 }
 
 myWaveFile::~myWaveFile() {
-	delete sampleData;
+	delete[] sampleData;
 }
 
 bool myWaveFile::readHeader() {
@@ -97,14 +97,14 @@ void myWaveFile::readSubChunk2() {
 		
 	}
 
-	// Average out data points to fit on screen (1000px?)
+	// Average out data points to fit on screen (1000px)
 	int residue = numberOfSamples % 1000;
 	int scaleFactor = numberOfSamples / 1000;
 	long sum = 0;
 	int j = 0;
 	sampleData = new long[1000];
 	int count = 0;
-	//BUG: count goes greater than 1000
+
 	for (i = 0; i < numberOfSamples-residue-scaleFactor; i+=scaleFactor) {
 		for (j = 0; j < scaleFactor; j++) {
 			sum += dataArray16b[i + j];

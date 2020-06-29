@@ -58,9 +58,7 @@ void myFrame::OnExit(wxCommandEvent& event) {
 
 void myFrame::OnOpen(wxCommandEvent& event)
 {
-	if (panel != NULL) {
-		panel->Close(true);
-	}
+	delete panel;
 	wxFileDialog openDialog(this, ("Open a Wave file"), "", "", "Wave files (*.wav)|*.wav", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	
 	if (openDialog.ShowModal() == wxID_CANCEL) {
