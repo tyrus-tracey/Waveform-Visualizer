@@ -1,6 +1,7 @@
 #include "myWaveFile.h"
 #include "wx/wx.h"
 #include "intrin.h"
+#include "math.h"
 
 myWaveFile::myWaveFile(wxString filepath)
 	: wxFFile(filepath, "rb")
@@ -108,13 +109,18 @@ void myWaveFile::constrainWidth(const int screenWidth)
 	sampleData = new long[screenWidth];
 	int count = 0;
 
-	for (int i = 0; i < maxIndex; i += scaleFactor) {
-		for (j = 0; j < scaleFactor; j++) {
-			sum += dataArray16b[i + j];
+	if (screenWidth >= 2) {
+		for (int i = 0; i < maxIndex; i += scaleFactor) {
+			for (j = 0; j < scaleFactor; j++) {
+				sum += dataArray16b[i + j];
+			}
+			sum /= j;
+			sampleData[count] = sum;
+			count++;
 		}
-		sum /= j;
-		sampleData[count] = sum;
-		count++;
+	}
+	else {
+		wxMessageBox("Error: Panel size cannot support waveform display.");
 	}
 
 	delete[] dataArray8b;
@@ -122,9 +128,15 @@ void myWaveFile::constrainWidth(const int screenWidth)
 	return;
 }
 
-void myWaveFile::constrainHeight(const int screenHeight)
+void myWaveFile::constrainHeight(const int screenWidth, const int screenHeight)
 {
-
+	double divisor = getMaxAmplitude(screenWidth) / (double(screenHeight/2) + 1);
+	for (int i = 0; i < screenWidth; i++) {
+		long test = sampleData[i];
+		sampleData[i] /= divisor;
+		long test2 = sampleData[i];
+	}
+	return;
 }
 
 long myWaveFile::getDataAmplitude(const int index) const
@@ -133,6 +145,17 @@ long myWaveFile::getDataAmplitude(const int index) const
 		return sampleData[index];
 	}
 	return -1;
+}
+
+long myWaveFile::getMaxAmplitude(const int screenWidth) const
+{
+	long max = 0;
+	for (int i = 0; i < screenWidth; i++) {
+		if (abs(sampleData[i] > max)) {
+			max = sampleData[i];
+		}
+	}
+	return max;
 }
 
 unsigned short myWaveFile::getAudioFormat() const

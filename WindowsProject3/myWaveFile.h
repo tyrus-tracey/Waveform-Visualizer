@@ -10,7 +10,7 @@ public:
 	void readSubChunk1();
 	void readSubChunk2();
 	void constrainWidth(const int screenWidth);
-	void constrainHeight(const int screenHeight);
+	void constrainHeight(const int screenWidth, const int screenHeight);
 
 	long getDataAmplitude(const int index) const;
 	unsigned short getAudioFormat() const;
@@ -21,6 +21,7 @@ public:
 	int getNumberOfSamples() const;
 
 private:
+	long getMaxAmplitude(const int screenWidth) const;
 
 	//Header
 	uint32_t filesize;
