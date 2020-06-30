@@ -9,8 +9,10 @@ public:
 	bool readHeader();
 	void readSubChunk1();
 	void readSubChunk2();
+	void constrainWidth(const int screenWidth);
+	void constrainHeight(const int screenHeight);
 
-	long getDataAmplitude(int index) const;
+	long getDataAmplitude(const int index) const;
 	unsigned short getAudioFormat() const;
 	unsigned short getChannels() const;
 	uint32_t getSampleRate() const;
@@ -19,6 +21,7 @@ public:
 	int getNumberOfSamples() const;
 
 private:
+
 	//Header
 	uint32_t filesize;
 

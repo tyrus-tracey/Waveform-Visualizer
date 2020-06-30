@@ -59,6 +59,7 @@ void myPanel::drawTest(wxDC& dc) {
 		else {
 			wavFile->readSubChunk1();
 			wavFile->readSubChunk2();
+			wavFile->constrainWidth(maxWidth);
 		}
 	}
 	

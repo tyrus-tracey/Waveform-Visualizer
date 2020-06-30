@@ -61,7 +61,8 @@ void myWaveFile::readSubChunk1() {
 	Read(&blockAlign, 2);
 	Read(&bitsPerSample, 2);
 }
-//TODO: doesn;t seem to read all samples, or it gets truncated at sampleData[]
+//BUG: does not properly handle stereo files at the moment, but outside assignment scope
+//TODO: average amplitudes to a range within screen (-250...250)?
 void myWaveFile::readSubChunk2() {
 	char buffer1B[1];
 	char charBuffer[5];
@@ -93,18 +94,21 @@ void myWaveFile::readSubChunk2() {
 			Read(ptr, 2);
 			ptr++;
 		}
-		
 	}
+	Close();
+}
 
-	// Average out data points to fit on screen (1000px)
-	int residue = numberOfSamples % 1000;
-	int scaleFactor = numberOfSamples / 1000;
+void myWaveFile::constrainWidth(const int screenWidth)
+{
+	int residue = numberOfSamples % screenWidth;
+	int scaleFactor = numberOfSamples / screenWidth;
+	int maxIndex = numberOfSamples - residue - scaleFactor;
 	long sum = 0;
 	int j = 0;
-	sampleData = new long[1000];
+	sampleData = new long[screenWidth];
 	int count = 0;
 
-	for (i = 0; i < numberOfSamples-residue-scaleFactor; i+=scaleFactor) {
+	for (int i = 0; i < maxIndex; i += scaleFactor) {
 		for (j = 0; j < scaleFactor; j++) {
 			sum += dataArray16b[i + j];
 		}
@@ -112,13 +116,18 @@ void myWaveFile::readSubChunk2() {
 		sampleData[count] = sum;
 		count++;
 	}
-	
+
 	delete[] dataArray8b;
 	delete[] dataArray16b;
-	Close();
+	return;
 }
 
-long myWaveFile::getDataAmplitude(int index) const
+void myWaveFile::constrainHeight(const int screenHeight)
+{
+
+}
+
+long myWaveFile::getDataAmplitude(const int index) const
 {
 	if (0 <= index && index <= numberOfSamples) {
 		return sampleData[index];
