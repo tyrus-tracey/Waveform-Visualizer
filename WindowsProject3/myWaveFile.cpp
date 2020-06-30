@@ -61,10 +61,9 @@ void myWaveFile::readSubChunk1() {
 	Read(&blockAlign, 2);
 	Read(&bitsPerSample, 2);
 }
-
+//TODO: doesn;t seem to read all samples, or it gets truncated at sampleData[]
 void myWaveFile::readSubChunk2() {
 	char buffer1B[1];
-	char buffer4B[4];
 	char charBuffer[5];
 
 	Read(charBuffer, 4);
@@ -89,10 +88,10 @@ void myWaveFile::readSubChunk2() {
 	}
 	else if (bitsPerSample == 16) {
 		dataArray16b = new short[numberOfSamples];
-
+		short* ptr = dataArray16b;
 		for (i = 0; i < numberOfSamples; i++) {
-			Read(buffer4B, sizeof(buffer4B));
-			dataArray16b[i] = *buffer4B;
+			Read(ptr, 2);
+			ptr++;
 		}
 		
 	}
