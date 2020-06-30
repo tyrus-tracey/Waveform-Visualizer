@@ -15,6 +15,7 @@ public:
 	void render(wxDC& dc);
 	void drawTest(wxDC& dc);
 	void displayInfo(wxDC& dc);
+	void drawMidline(wxDC& dc);
 	myWaveFile* getFile();
 
 private:

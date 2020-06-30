@@ -67,6 +67,7 @@ void myPanel::drawTest(wxDC& dc) {
 			int amplitude = wavFile->getDataAmplitude(i) / 2;
 			dc.DrawLine(wxPoint(i, midHeight - amplitude), wxPoint(i, midHeight + amplitude));
 		}
+		drawMidline(dc);
 		displayInfo(dc);
 	}
 
@@ -82,6 +83,17 @@ void myPanel::displayInfo(wxDC& dc)
 	wxString bitsPerSample = wxString::Format(wxT("%i"), wavFile->getBitsPerSample());
 	wxString numberOfSamples = wxString::Format(wxT("%i"), wavFile->getNumberOfSamples());
 
+	//Draw mini-window
+	wxBrush brush = dc.GetBrush();
+	wxPen pen = dc.GetPen();
+	pen.SetWidth(5);
+	pen.SetColour(wxColour(100, 150, 200));
+	brush.SetColour(wxColour(190, 210, 255));
+	dc.SetPen(pen);
+	dc.SetBrush(brush);
+	dc.DrawRectangle(0, 0, 250, 175);
+
+	//Display wave file information
 	dc.DrawText(wavFile->GetName(), wxPoint(20, 20));
 	displayText = "Audio Format: " + format;
 	dc.DrawText(displayText, wxPoint(20, 40));
@@ -96,9 +108,16 @@ void myPanel::displayInfo(wxDC& dc)
 	displayText = "# of Samples: " + numberOfSamples;
 	dc.DrawText(displayText, wxPoint(20, 140));
 
+	return;
+}
 
-
-
+void myPanel::drawMidline(wxDC& dc)
+{
+	wxPen pen = dc.GetPen();
+	pen.SetColour(wxColour(255, 125, 150));
+	dc.SetPen(pen);
+	dc.DrawLine(wxPoint(0, midHeight), wxPoint(maxWidth, midHeight));
+	return;
 }
 
 myWaveFile* myPanel::getFile()

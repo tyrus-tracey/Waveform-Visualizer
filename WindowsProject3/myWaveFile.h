@@ -9,6 +9,7 @@ public:
 	bool readHeader();
 	void readSubChunk1();
 	void readSubChunk2();
+
 	long getDataAmplitude(int index) const;
 	unsigned short getAudioFormat() const;
 	unsigned short getChannels() const;
