@@ -14,6 +14,7 @@ public:
 	void paintEvent(wxPaintEvent& event);
 	void render(wxDC& dc);
 	void drawTest(wxDC& dc);
+	void displayInfo(wxDC& dc);
 	myWaveFile* getFile();
 
 private:

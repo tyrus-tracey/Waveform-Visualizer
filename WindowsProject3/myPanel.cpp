@@ -50,7 +50,6 @@ void myPanel::render(wxDC& dc)
 }
 
 void myPanel::drawTest(wxDC& dc) {
-	dc.DrawText(wavFile->GetName(), wxPoint(40, 60));
 
 	// Read wave file
 	if (wavFile->IsOpened()) {
@@ -68,7 +67,37 @@ void myPanel::drawTest(wxDC& dc) {
 			int amplitude = wavFile->getDataAmplitude(i) / 2;
 			dc.DrawLine(wxPoint(i, midHeight - amplitude), wxPoint(i, midHeight + amplitude));
 		}
+		displayInfo(dc);
 	}
+
+}
+
+void myPanel::displayInfo(wxDC& dc)
+{
+	wxString displayText;
+	wxString format = (wavFile->getAudioFormat() == 1 ? "PCM" : "Unknown");
+	wxString channels = (wavFile->getChannels() == 1 ? "Mono" : "Stereo");
+	wxString sampleRate = wxString::Format(wxT("%i"), wavFile->getSampleRate());
+	wxString byteRate = wxString::Format(wxT("%i"), wavFile->getByteRate());
+	wxString bitsPerSample = wxString::Format(wxT("%i"), wavFile->getBitsPerSample());
+	wxString numberOfSamples = wxString::Format(wxT("%i"), wavFile->getNumberOfSamples());
+
+	dc.DrawText(wavFile->GetName(), wxPoint(20, 20));
+	displayText = "Audio Format: " + format;
+	dc.DrawText(displayText, wxPoint(20, 40));
+	displayText = "Channels: " + channels;
+	dc.DrawText(displayText, wxPoint(20, 60));
+	displayText = "Sample Rate: " + sampleRate + "Hz";
+	dc.DrawText(displayText, wxPoint(20, 80));
+	displayText = "Avg. Byte Rate: " + byteRate;
+	dc.DrawText(displayText, wxPoint(20, 100));
+	displayText = "Bits Per Sample: " + bitsPerSample + " bits";
+	dc.DrawText(displayText, wxPoint(20, 120));
+	displayText = "# of Samples: " + numberOfSamples;
+	dc.DrawText(displayText, wxPoint(20, 140));
+
+
+
 
 }
 

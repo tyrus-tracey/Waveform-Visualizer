@@ -9,8 +9,13 @@ public:
 	bool readHeader();
 	void readSubChunk1();
 	void readSubChunk2();
-	int getSampleCount();
-	long getDataAmplitude(int index);
+	long getDataAmplitude(int index) const;
+	unsigned short getAudioFormat() const;
+	unsigned short getChannels() const;
+	uint32_t getSampleRate() const;
+	uint32_t getByteRate() const;
+	unsigned short getBitsPerSample() const;
+	int getNumberOfSamples() const;
 
 private:
 	//Header

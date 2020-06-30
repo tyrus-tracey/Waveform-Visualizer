@@ -66,8 +66,6 @@ void myFrame::OnOpen(wxCommandEvent& event)
 		return;
 	}
 	
-	//myWaveFile* inputFile = new myWaveFile(openDialog.GetPath());
-	
 	panel = new myPanel(this, openDialog.GetPath());
 	GetSizer()->Add(panel, 1, wxEXPAND);
 

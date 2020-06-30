@@ -119,16 +119,41 @@ void myWaveFile::readSubChunk2() {
 	Close();
 }
 
-int myWaveFile::getSampleCount()
-{
-	return numberOfSamples;
-}
-
-long myWaveFile::getDataAmplitude(int index)
+long myWaveFile::getDataAmplitude(int index) const
 {
 	if (0 <= index && index <= numberOfSamples) {
 		return sampleData[index];
 	}
 	return -1;
+}
+
+unsigned short myWaveFile::getAudioFormat() const
+{
+	return audioFormat;
+}
+
+unsigned short myWaveFile::getChannels() const
+{
+	return channels;
+}
+
+uint32_t myWaveFile::getSampleRate() const
+{
+	return sampleRate;
+}
+
+uint32_t myWaveFile::getByteRate() const
+{
+	return byteRate;
+}
+
+unsigned short myWaveFile::getBitsPerSample() const
+{
+	return bitsPerSample;
+}
+
+int myWaveFile::getNumberOfSamples() const
+{
+	return numberOfSamples;
 }
 
