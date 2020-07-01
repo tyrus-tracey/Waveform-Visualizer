@@ -15,14 +15,18 @@ public:
 	void readSubChunk2();
 	
 	void constrainToScreen(const int screenWidth, const int screenHeight);
-	long getDataAmplitude(const int index) const;
-	unsigned short getAudioFormat() const;
-	unsigned short getChannels() const;
-	uint32_t getSampleRate() const;
-	uint32_t getByteRate() const;
-	unsigned short getBitsPerSample() const;
-	int getNumberOfSamples() const;
-	long getMaxAmplitude() const;
+	
+
+	long			getDataAmplitude(const int index) const;
+	unsigned short	getAudioFormat() const;
+	unsigned short	getChannels() const;
+	uint32_t		getSampleRate() const;
+	uint32_t		getByteRate() const;
+	unsigned short	getBitsPerSample() const;
+	int				getNumberOfSamples() const;
+	long			getMaxAmplitude() const;
+	void fadeIn(const int screenWidth, const int screenHeight);
+	void fadeOut(const int screenWidth, const int screenHeight);
 
 private:
 	long getMaxBinnedAmplitude(const int screenWidth) const;

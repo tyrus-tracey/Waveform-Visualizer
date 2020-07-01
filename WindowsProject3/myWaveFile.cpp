@@ -160,6 +160,37 @@ void myWaveFile::constrainHeight(const int screenWidth, const int screenHeight)
 	return;
 }
 
+//increment needs some tuning. possibly emulate floats by incrementing every other sample?
+void myWaveFile::fadeIn(const int screenWidth, const int screenHeight)
+{
+	int reduction = screenHeight / 2;
+	int increment = 1;
+	long result;
+	for (int i = 0; i < screenWidth / 2; i++) {
+		result = abs(sampleData[i]) - reduction;
+		if (result < 0) { result = 0; }
+		sampleData[i] = result;
+		if (reduction - increment > 0) { reduction -= increment; }
+		else { reduction = 0; }
+	}
+	return;
+}
+
+void myWaveFile::fadeOut(const int screenWidth, const int screenHeight)
+{
+	int reduction = 0;
+	int increment = 1;
+	long result;
+	for (int i = screenWidth/2; i < screenWidth; i++) {
+		result = abs(sampleData[i]) - reduction;
+		if (result < 0) { result = 0; }
+		sampleData[i] = result;
+		if (reduction + increment < screenHeight/2) { reduction += increment; }
+		else { reduction = screenHeight/2; }
+	}
+	return;
+}
+
 // High-level function calls both contraining functions.
 void myWaveFile::constrainToScreen(const int screenWidth, const int screenHeight)
 {
@@ -188,6 +219,7 @@ long myWaveFile::getMaxBinnedAmplitude(const int screenWidth) const
 	}
 	return max;
 }
+
 
 unsigned short myWaveFile::getAudioFormat() const
 {
