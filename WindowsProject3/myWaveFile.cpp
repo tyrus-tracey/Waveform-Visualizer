@@ -1,8 +1,8 @@
 #include "myWaveFile.h"
 #include "wx/wx.h"
 #include "intrin.h"
-#include "math.h"
 
+// Using base class constructor, open the wave file in binary mode
 myWaveFile::myWaveFile(wxString filepath)
 	: wxFFile(filepath, "rb")
 {
@@ -19,10 +19,12 @@ myWaveFile::myWaveFile(wxString filepath)
 	chunk2Size = 0;
 }
 
+// Since this was allocated manually this must also be deleted manually.
 myWaveFile::~myWaveFile() {
 	delete[] sampleData;
 }
 
+// Check that selected file is indeed a wave file.
 bool myWaveFile::readHeader() {
 	char buffer4B[5];
 
@@ -43,6 +45,7 @@ bool myWaveFile::readHeader() {
 	return true;
 }
 
+// Read subchunk 1 to myWaveFile member variables
 void myWaveFile::readSubChunk1() {
 	//verify fmt
 	char charBuffer[5];
@@ -62,8 +65,9 @@ void myWaveFile::readSubChunk1() {
 	Read(&blockAlign, 2);
 	Read(&bitsPerSample, 2);
 }
+
 //BUG: does not properly handle stereo files at the moment, but outside assignment scope
-//TODO: average amplitudes to a range within screen (-250...250)?
+// Read subchunk 2 to myWaveFile member variables.
 void myWaveFile::readSubChunk2() {
 	char buffer1B[1];
 	char charBuffer[5];
@@ -96,26 +100,31 @@ void myWaveFile::readSubChunk2() {
 			ptr++;
 		}
 	}
-	Close();
+	Close(); // Indicate successful read
 }
 
+// Compress raw samples to fit within screen width, by averaging values.
+// Residue samples are ignored, but this is only a small percentage of samples.
+// Raw samples are grouped into bins of size scaleFactor, with the number of bins equal to screenWidth
+// Means are taken from each bin and then saved to sampleData array.
 void myWaveFile::constrainWidth(const int screenWidth)
 {
-	int residue = numberOfSamples % screenWidth;
+	int residue = numberOfSamples % screenWidth; //Allows clean division of samples by number of bins
 	int scaleFactor = numberOfSamples / screenWidth;
 	int maxIndex = numberOfSamples - residue - scaleFactor;
-	long sum = 0;
-	int j = 0;
 	sampleData = new long[screenWidth];
-	int count = 0;
+	int count = 0; //Keep track of what index of sampleData we've written to
+	long sum = 0; //Avoid potential overflows by using long
+	int binMean = 0;
 
-	if (screenWidth >= 2) {
-		for (int i = 0; i < maxIndex; i += scaleFactor) {
-			for (j = 0; j < scaleFactor; j++) {
-				sum += dataArray16b[i + j];
+	if (screenWidth >= 2) { // Avoid potential memory overwrites
+		int i = 0;
+		for (int bin = 0; bin < maxIndex; bin += scaleFactor) {
+			for (i = 0; i < scaleFactor; i++) {
+				sum += dataArray16b[bin + i];
 			}
-			sum /= j;
-			sampleData[count] = sum;
+			binMean = sum /= i;
+			sampleData[count] = binMean;
 			count++;
 		}
 	}
@@ -123,22 +132,30 @@ void myWaveFile::constrainWidth(const int screenWidth)
 		wxMessageBox("Error: Panel size cannot support waveform display.");
 	}
 
-	delete[] dataArray8b;
+	delete[] dataArray8b; // No longer require raw sample data
 	delete[] dataArray16b;
 	return;
 }
 
+// Constrain amplitudes of waveform to a range half the height of the screen
 void myWaveFile::constrainHeight(const int screenWidth, const int screenHeight)
 {
 	double divisor = getMaxAmplitude(screenWidth) / (double(screenHeight/2) + 1);
 	for (int i = 0; i < screenWidth; i++) {
-		long test = sampleData[i];
 		sampleData[i] /= divisor;
-		long test2 = sampleData[i];
 	}
 	return;
 }
 
+// High-level function calls both contraining functions.
+void myWaveFile::constrainToScreen(const int screenWidth, const int screenHeight)
+{
+	constrainWidth(screenWidth);
+	constrainHeight(screenWidth, screenHeight);
+	return;
+}
+
+// Returns sampleData array element from an index
 long myWaveFile::getDataAmplitude(const int index) const
 {
 	if (0 <= index && index <= numberOfSamples) {
@@ -147,6 +164,7 @@ long myWaveFile::getDataAmplitude(const int index) const
 	return -1;
 }
 
+// Finds the largest amplitude in order to resize amplitude range
 long myWaveFile::getMaxAmplitude(const int screenWidth) const
 {
 	long max = 0;

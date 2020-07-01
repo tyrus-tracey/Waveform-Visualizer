@@ -2,21 +2,22 @@
 #include "myWaveFile.h"
 #include <intrin.h>
 
+// Using base class constructor, create a frame of a specified size in the app.
 myFrame::myFrame(wxSize& appDimensions) 
 	: wxFrame(NULL, wxID_ANY, "Waveform Visualizer", wxPoint(0,0), appDimensions), panel(NULL)
 {
 	createMenuBar();
 		
-	frameSizer = new wxBoxSizer(wxHORIZONTAL);
+	frameSizer = new wxBoxSizer(wxHORIZONTAL); //Sizers handle spacing of elements within frame
 	SetSizer(frameSizer);
 	SetAutoLayout(true);
-	Show(true);
-	
+	Show(true); // Display this frame
 }
 
 myFrame::~myFrame() {
 }
 
+// Create the menu bar and bind some events to menu options
 void myFrame::createMenuBar() {
 	wxMenu* menuFile = new wxMenu;
 	menuFile->Append(ID_Open, "&Open a Wave File");
@@ -51,23 +52,25 @@ void myFrame::OnAbout(wxCommandEvent& event) {
 
 void myFrame::OnExit(wxCommandEvent& event) {
 	if (panel != NULL) {
-		panel->Close(true);
+		panel->Close(true); // Stop displaying
 	}
-	Close(true);
+	Close(true); // Stop displaying
 }
 
+// If user selects a wave file, a new panel will be created using that file.
+// Then, that panel will be attached to the frame using the frame's sizer.
 void myFrame::OnOpen(wxCommandEvent& event)
 {
-	delete panel;
+	delete panel; // Delete panel if one exists
 	wxFileDialog openDialog(this, ("Open a Wave file"), "", "", "Wave files (*.wav)|*.wav", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	
-	if (openDialog.ShowModal() == wxID_CANCEL) {
+	if (openDialog.ShowModal() == wxID_CANCEL) { // If user cancels the dialog
 		wxMessageBox("No file was chosen.");
 		return;
 	}
 	
-	panel = new myPanel(this, openDialog.GetPath());
-	GetSizer()->Add(panel, 1, wxEXPAND);
+	panel = new myPanel(this, openDialog.GetPath()); // Create a new panel with given wave file
+	GetSizer()->Add(panel, 1, wxEXPAND); // Add the panel to the frame's sizer
 
-	Refresh();
+	Refresh(); //Redraw the frame
 }

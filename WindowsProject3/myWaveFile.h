@@ -1,6 +1,10 @@
 #pragma once
 #include "wx/wfstream.h"
 
+/*
+	File class that stores and manipulates information from a wave file.
+*/
+
 class myWaveFile : public wxFFile
 {
 public:
@@ -9,9 +13,8 @@ public:
 	bool readHeader();
 	void readSubChunk1();
 	void readSubChunk2();
-	void constrainWidth(const int screenWidth);
-	void constrainHeight(const int screenWidth, const int screenHeight);
-
+	
+	void constrainToScreen(const int screenWidth, const int screenHeight);
 	long getDataAmplitude(const int index) const;
 	unsigned short getAudioFormat() const;
 	unsigned short getChannels() const;
@@ -22,6 +25,8 @@ public:
 
 private:
 	long getMaxAmplitude(const int screenWidth) const;
+	void constrainWidth(const int screenWidth);
+	void constrainHeight(const int screenWidth, const int screenHeight);
 
 	//Header
 	uint32_t filesize;

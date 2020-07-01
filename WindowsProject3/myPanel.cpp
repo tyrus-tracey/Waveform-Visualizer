@@ -1,9 +1,13 @@
 #include "myPanel.h"
 
+//Bind paint events to this panel
 wxBEGIN_EVENT_TABLE(myPanel, wxPanel)
 EVT_PAINT(myPanel::paintEvent)
 END_EVENT_TABLE()
 
+//Using the base class constructor, create a panel and an associated myWaveFile as a child
+//The parent/child relationship allows for multiple panels to open with each one 
+//	having it's own waveform. However, currently this is not implemented.
 myPanel::myPanel(wxFrame* parent, const wxString filepath) 
 	: wxPanel(parent, wxID_ANY, wxPoint(0,0), parent->GetSize())
 {
@@ -11,8 +15,6 @@ myPanel::myPanel(wxFrame* parent, const wxString filepath)
 	if(wavFile == NULL) {
 		wxMessageBox("Error: Could not find associated WAVE file.");
 	}
-
-
 	maxSize = parent->GetSize();
 	SetSize(maxSize);
 	midHeight	= maxSize.y / 2;
@@ -24,32 +26,40 @@ myPanel::myPanel(wxFrame* parent, const wxString filepath)
 
 myPanel::~myPanel()
 {
-	delete wavFile;
+	delete wavFile; //required to delete manually allocated elements of myWaveFile
 }
 
+// 'dc' is a device context (the screen) that is used for drawing on the panel
 void myPanel::paintEvent(wxPaintEvent& event)
 {
 	wxBufferedPaintDC dc(this);
 	PrepareDC(dc);
-	render(dc);
-	
-	drawTest(dc);
+	drawBackground(dc);
+	drawWaveform(dc);
 }
 
-void myPanel::render(wxDC& dc)
+// Prepare a clean background to draw the waveform on.
+void myPanel::drawBackground(wxDC& dc)
 {
-	wxBrush brush = dc.GetBrush();
-	wxPen pen = dc.GetPen();
+	wxBrush brush = dc.GetBrush();	// Rectangle body 
+	wxPen pen = dc.GetPen();		// Rectangle border
 	pen.SetStyle(wxPENSTYLE_SOLID);
 	pen.SetColour(wxColour(100,150,200));
 	dc.SetPen(pen);
 	dc.SetBrush(brush);
+	dc.DrawRectangle(wxRect(maxSize));	//	Since this is purely a visual element,
+										//	I should be allowed this convenience and not have to 
+										//	manually draw a rectangle.
 
-	dc.DrawRectangle(wxRect(maxSize));
-	
+	return;
 }
 
-void myPanel::drawTest(wxDC& dc) {
+/*
+	Step 1: Read data from inputted wave file.
+	Step 2: Resize wave file data to within the screen limits.
+	Step 3: Display waveform.
+*/
+void myPanel::drawWaveform(wxDC& dc) {
 
 	// Read wave file
 	if (wavFile->IsOpened()) {
@@ -59,14 +69,15 @@ void myPanel::drawTest(wxDC& dc) {
 		else {
 			wavFile->readSubChunk1();
 			wavFile->readSubChunk2();
-			wavFile->constrainWidth(maxWidth);
-			wavFile->constrainHeight(maxWidth, maxHeight);
+			wavFile->constrainToScreen(maxWidth, maxHeight);
 		}
 	}
 	
+	// Ensure wave file has been read successfully before drawing.
+	// For each pixel across the width of the panel, display amplitude of wave file data.
 	if (!wavFile->IsOpened()) {
 		for (int i = 0; i < GetSize().x; i++) {
-			int amplitude = wavFile->getDataAmplitude(i) / 2;
+			int amplitude = wavFile->getDataAmplitude(i) / 2; // Center waveform to panel midline
 			dc.DrawLine(wxPoint(i, midHeight - amplitude), wxPoint(i, midHeight + amplitude));
 		}
 		drawMidline(dc);
@@ -75,6 +86,7 @@ void myPanel::drawTest(wxDC& dc) {
 
 }
 
+// Display wave file parameters.
 void myPanel::displayInfo(wxDC& dc)
 {
 	wxString displayText;
@@ -113,6 +125,7 @@ void myPanel::displayInfo(wxDC& dc)
 	return;
 }
 
+// Draw a line representing 0 amplitude.
 void myPanel::drawMidline(wxDC& dc)
 {
 	wxPen pen = dc.GetPen();

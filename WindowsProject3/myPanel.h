@@ -5,6 +5,10 @@
 #include "myWaveFile.h"
 #include "wx/panel.h"
 
+/*
+	Panels are windows within frames that allow for drawing operations.
+*/
+
 class myPanel : public wxPanel
 {
 public:
@@ -12,8 +16,8 @@ public:
 	~myPanel();
 
 	void paintEvent(wxPaintEvent& event);
-	void render(wxDC& dc);
-	void drawTest(wxDC& dc);
+	void drawBackground(wxDC& dc);
+	void drawWaveform(wxDC& dc);
 	void displayInfo(wxDC& dc);
 	void drawMidline(wxDC& dc);
 	myWaveFile* getFile();
