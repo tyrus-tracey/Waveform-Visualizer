@@ -43,7 +43,7 @@ private:
 	
 	//SubChunk2
 	uint32_t chunk2Size;
-	unsigned int* dataArray8b = NULL;
+	uint8_t * dataArray8b = NULL;
 	short* dataArray16b = NULL;
 	long* sampleData = NULL;
 };

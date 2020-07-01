@@ -1,6 +1,5 @@
 #pragma once
 #include "wx/wx.h"
-#include "wx/wfstream.h"
 #include "wx/file.h"
 #include "myPanel.h"
 

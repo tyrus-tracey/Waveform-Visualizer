@@ -69,7 +69,6 @@ void myWaveFile::readSubChunk1() {
 //BUG: does not properly handle stereo files at the moment, but outside assignment scope
 // Read subchunk 2 to myWaveFile member variables.
 void myWaveFile::readSubChunk2() {
-	char buffer1B[1];
 	char charBuffer[5];
 
 	Read(charBuffer, 4);
@@ -86,10 +85,11 @@ void myWaveFile::readSubChunk2() {
 	int i = 0;
 	//Begin reading audio data
 	if (bitsPerSample == 8) {
-		dataArray8b = new unsigned int[numberOfSamples];
-		while (!Eof()) {
-			Read(buffer1B, sizeof(buffer1B));
-			dataArray8b[i++] = *buffer1B;
+		dataArray8b = new uint8_t[numberOfSamples];
+		uint8_t* ptr = dataArray8b;
+		for (i = 0; i < numberOfSamples; i++) {
+			Read(ptr, 1);
+			ptr++;
 		}
 	}
 	else if (bitsPerSample == 16) {
@@ -120,9 +120,16 @@ void myWaveFile::constrainWidth(const int screenWidth)
 	if (screenWidth >= 2) { // Avoid potential memory overwrites
 		int i = 0;
 		for (int bin = 0; bin < maxIndex; bin += scaleFactor) {
-			for (i = 0; i < scaleFactor; i++) {
-				sum += dataArray16b[bin + i];
+			if (bitsPerSample == 8) {
+				for (i = 0; i < scaleFactor; i++) {
+					sum += dataArray8b[bin + i];
+				}
 			}
+			else if (bitsPerSample == 16) {
+				for (i = 0; i < scaleFactor; i++) {
+					sum += dataArray16b[bin + i];
+				}
+			} 
 			binMean = sum /= i;
 			sampleData[count] = binMean;
 			count++;
@@ -132,7 +139,8 @@ void myWaveFile::constrainWidth(const int screenWidth)
 		wxMessageBox("Error: Panel size cannot support waveform display.");
 	}
 
-	delete[] dataArray8b; // No longer require raw sample data
+	// No longer require raw sample data
+	delete[] dataArray8b; 
 	delete[] dataArray16b;
 	return;
 }

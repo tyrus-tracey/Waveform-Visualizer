@@ -1,7 +1,6 @@
 #pragma once
 #include "wx/wx.h"
 #include "wx/dcbuffer.h"
-#include "wx/wfstream.h"
 #include "myWaveFile.h"
 #include "wx/panel.h"
 
