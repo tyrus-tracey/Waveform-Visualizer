@@ -96,6 +96,7 @@ void myPanel::displayInfo(wxDC& dc)
 	wxString byteRate = wxString::Format(wxT("%i"), wavFile->getByteRate());
 	wxString bitsPerSample = wxString::Format(wxT("%i"), wavFile->getBitsPerSample());
 	wxString numberOfSamples = wxString::Format(wxT("%i"), wavFile->getNumberOfSamples());
+	wxString maxAmplitude = wxString::Format(wxT("%i"), wavFile->getMaxAmplitude());
 
 	//Draw mini-window
 	wxBrush brush = dc.GetBrush();
@@ -105,22 +106,24 @@ void myPanel::displayInfo(wxDC& dc)
 	brush.SetColour(wxColour(190, 210, 255));
 	dc.SetPen(pen);
 	dc.SetBrush(brush);
-	dc.DrawRectangle(0, 0, 250, 175);
+	dc.DrawRectangle(0, 0, 250, 155);
 
 	//Display wave file information
-	dc.DrawText(wavFile->GetName(), wxPoint(20, 20));
+	dc.DrawText(wavFile->GetName(), wxPoint(10, 5));
 	displayText = "Audio Format: " + format;
-	dc.DrawText(displayText, wxPoint(20, 40));
+	dc.DrawText(displayText, wxPoint(10, 23));
 	displayText = "Channels: " + channels;
-	dc.DrawText(displayText, wxPoint(20, 60));
+	dc.DrawText(displayText, wxPoint(10, 41));
 	displayText = "Sample Rate: " + sampleRate + "Hz";
-	dc.DrawText(displayText, wxPoint(20, 80));
+	dc.DrawText(displayText, wxPoint(10, 59));
 	displayText = "Avg. Byte Rate: " + byteRate;
-	dc.DrawText(displayText, wxPoint(20, 100));
+	dc.DrawText(displayText, wxPoint(10, 77));
 	displayText = "Bits Per Sample: " + bitsPerSample + " bits";
-	dc.DrawText(displayText, wxPoint(20, 120));
+	dc.DrawText(displayText, wxPoint(10, 95));
 	displayText = "# of Samples: " + numberOfSamples;
-	dc.DrawText(displayText, wxPoint(20, 140));
+	dc.DrawText(displayText, wxPoint(10, 113));
+	displayText = "Max Amplitude: " + maxAmplitude;
+	dc.DrawText(displayText, wxPoint(10, 131));
 
 	return;
 }

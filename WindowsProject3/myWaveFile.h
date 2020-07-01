@@ -22,9 +22,10 @@ public:
 	uint32_t getByteRate() const;
 	unsigned short getBitsPerSample() const;
 	int getNumberOfSamples() const;
+	long getMaxAmplitude() const;
 
 private:
-	long getMaxAmplitude(const int screenWidth) const;
+	long getMaxBinnedAmplitude(const int screenWidth) const;
 	void constrainWidth(const int screenWidth);
 	void constrainHeight(const int screenWidth, const int screenHeight);
 
@@ -46,6 +47,6 @@ private:
 	uint8_t * dataArray8b = NULL;
 	short* dataArray16b = NULL;
 	long* sampleData = NULL;
-	
+	long maxAmplitude;
 };
 

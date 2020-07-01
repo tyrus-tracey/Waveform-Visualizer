@@ -17,6 +17,7 @@ myWaveFile::myWaveFile(wxString filepath)
 	bitsPerSample = 0;
 	numberOfSamples = 0;
 	chunk2Size = 0;
+	maxAmplitude = 0;
 }
 
 // Since this was allocated manually this must also be deleted manually.
@@ -83,12 +84,14 @@ void myWaveFile::readSubChunk2() {
 	numberOfSamples = (chunk2Size / channels) / (bitsPerSample / 8);
 
 	int i = 0;
+	long max = 0;
 	//Begin reading audio data
 	if (bitsPerSample == 8) {
 		dataArray8b = new uint8_t[numberOfSamples];
 		uint8_t* ptr = dataArray8b;
 		for (i = 0; i < numberOfSamples; i++) {
 			Read(ptr, 1);
+			if (abs(*ptr) > max) { max = *ptr; }
 			ptr++;
 		}
 	}
@@ -97,9 +100,11 @@ void myWaveFile::readSubChunk2() {
 		short* ptr = dataArray16b;
 		for (i = 0; i < numberOfSamples; i++) {
 			Read(ptr, 2);
+			if (abs(*ptr) > max) { max = *ptr; }
 			ptr++;
 		}
 	}
+	maxAmplitude = max;
 	Close(); // Indicate successful read
 }
 
@@ -148,7 +153,7 @@ void myWaveFile::constrainWidth(const int screenWidth)
 // Constrain amplitudes of waveform to a range half the height of the screen
 void myWaveFile::constrainHeight(const int screenWidth, const int screenHeight)
 {
-	double divisor = getMaxAmplitude(screenWidth) / (double(screenHeight/2) + 1);
+	double divisor = getMaxBinnedAmplitude(screenWidth) / (double(screenHeight/2) + 1);
 	for (int i = 0; i < screenWidth; i++) {
 		sampleData[i] /= divisor;
 	}
@@ -173,7 +178,7 @@ long myWaveFile::getDataAmplitude(const int index) const
 }
 
 // Finds the largest amplitude in order to resize amplitude range
-long myWaveFile::getMaxAmplitude(const int screenWidth) const
+long myWaveFile::getMaxBinnedAmplitude(const int screenWidth) const
 {
 	long max = 0;
 	for (int i = 0; i < screenWidth; i++) {
@@ -212,5 +217,10 @@ unsigned short myWaveFile::getBitsPerSample() const
 int myWaveFile::getNumberOfSamples() const
 {
 	return numberOfSamples;
+}
+
+long myWaveFile::getMaxAmplitude() const
+{
+	return maxAmplitude;
 }
 
