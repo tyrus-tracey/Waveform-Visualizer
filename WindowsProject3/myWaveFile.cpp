@@ -115,22 +115,22 @@ void myWaveFile::constrainWidth(const int screenWidth)
 	sampleData = new long[screenWidth];
 	int count = 0; //Keep track of what index of sampleData we've written to
 	long sum = 0; //Avoid potential overflows by using long
-	int binMean = 0;
+	long binMean = 0;
 
 	if (screenWidth >= 2) { // Avoid potential memory overwrites
 		int i = 0;
 		for (int bin = 0; bin < maxIndex; bin += scaleFactor) {
 			if (bitsPerSample == 8) {
 				for (i = 0; i < scaleFactor; i++) {
-					sum += dataArray8b[bin + i];
+					sum += long(dataArray8b[bin + i]);
 				}
 			}
 			else if (bitsPerSample == 16) {
 				for (i = 0; i < scaleFactor; i++) {
-					sum += dataArray16b[bin + i];
+					sum += long(dataArray16b[bin + i]);
 				}
 			} 
-			binMean = sum /= i;
+			binMean = sum /= long(i);
 			sampleData[count] = binMean;
 			count++;
 		}

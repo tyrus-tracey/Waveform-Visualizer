@@ -46,5 +46,6 @@ private:
 	uint8_t * dataArray8b = NULL;
 	short* dataArray16b = NULL;
 	long* sampleData = NULL;
+	
 };
 
