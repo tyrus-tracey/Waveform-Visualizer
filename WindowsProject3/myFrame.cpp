@@ -6,11 +6,10 @@
 myFrame::myFrame(wxSize& appDimensions) 
 	: wxFrame(NULL, wxID_ANY, "Waveform Visualizer", wxPoint(0,0), appDimensions), panel(NULL)
 {
+	SetMinClientSize(appDimensions);
+	SetMaxClientSize(appDimensions);
 	createMenuBar();
-		
-	frameSizer = new wxBoxSizer(wxHORIZONTAL); //Sizers handle spacing of elements within frame
-	SetSizer(frameSizer);
-	SetAutoLayout(true);
+
 	Show(true); // Display this frame
 }
 
@@ -32,9 +31,6 @@ void myFrame::createMenuBar() {
 	menuBar->Append(menuHelp, "&Help");
 
 	SetMenuBar(menuBar);
-	CreateStatusBar();
-	SetStatusText("This is the Status Bar.");
-
 	Bind(wxEVT_MENU, &myFrame::OnOpen, this, ID_Open);
 	Bind(wxEVT_MENU, &myFrame::OnAbout, this, wxID_ABOUT);
 	Bind(wxEVT_MENU, &myFrame::OnExit, this, wxID_EXIT);
@@ -58,7 +54,6 @@ void myFrame::OnExit(wxCommandEvent& event) {
 }
 
 // If user selects a wave file, a new panel will be created using that file.
-// Then, that panel will be attached to the frame using the frame's sizer.
 void myFrame::OnOpen(wxCommandEvent& event)
 {
 	delete panel; // Delete panel if one exists
@@ -70,7 +65,6 @@ void myFrame::OnOpen(wxCommandEvent& event)
 	}
 	
 	panel = new myPanel(this, openDialog.GetPath()); // Create a new panel with given wave file
-	GetSizer()->Add(panel, 1, wxEXPAND); // Add the panel to the frame's sizer
-
+	Fit();
 	Refresh(); //Redraw the frame
 }
