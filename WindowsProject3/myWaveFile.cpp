@@ -160,33 +160,28 @@ void myWaveFile::constrainHeight(const int screenWidth, const int screenHeight)
 	return;
 }
 
-//increment needs some tuning. possibly emulate floats by incrementing every other sample?
+// Reduces amplitude by a linearly decreasing value, from max amplitude to zero
 void myWaveFile::fadeIn(const int screenWidth, const int screenHeight)
 {
-	int reduction = screenHeight / 2;
-	int increment = 1;
-	long result;
+	float increment = 1 / (float(screenWidth) / 2);
+	double factor = 0;
 	for (int i = 0; i < screenWidth / 2; i++) {
-		result = abs(sampleData[i]) - reduction;
-		if (result < 0) { result = 0; }
-		sampleData[i] = result;
-		if (reduction - increment > 0) { reduction -= increment; }
-		else { reduction = 0; }
+		sampleData[i] *= factor;
+		if (sampleData[i] > screenWidth / 2) { sampleData[i] = screenWidth / 2; }
+		factor += increment;
 	}
 	return;
 }
 
+// Reduces amplitude by a linearly increasing value, from zero to max amplitude
 void myWaveFile::fadeOut(const int screenWidth, const int screenHeight)
 {
-	int reduction = 0;
-	int increment = 1;
-	long result;
+	float increment = 1 / (float(screenWidth) / 2);
+	double factor = 1;
 	for (int i = screenWidth/2; i < screenWidth; i++) {
-		result = abs(sampleData[i]) - reduction;
-		if (result < 0) { result = 0; }
-		sampleData[i] = result;
-		if (reduction + increment < screenHeight/2) { reduction += increment; }
-		else { reduction = screenHeight/2; }
+		sampleData[i] *= factor;
+		if (sampleData[i] > screenWidth / 2) { sampleData[i] = screenWidth / 2; }
+		factor -= increment;
 	}
 	return;
 }

@@ -46,8 +46,8 @@ myPanel* myFrame::getPanel()
 }
 
 void myFrame::OnAbout(wxCommandEvent& event) {
-	wxMessageBox("This is a wxWidgets Hello World example",
-		"About Hello World", wxOK | wxICON_INFORMATION);
+	wxMessageBox("Please select a WAVE file using the top right menu.",
+		"How to Use", wxOK | wxICON_INFORMATION);
 }
 
 void myFrame::OnExit(wxCommandEvent& event) {
